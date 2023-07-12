@@ -22,10 +22,14 @@ pub fn build(b: *std.Build) anyerror!void {
     b.installArtifact(kernel);
 
     const qemu_cmd = b.addSystemCommand(&.{
-        "qemu-system-riscv64", "-machine",   "virt",               "-bios",
-        "none",                "-kernel",    "zig-out/bin/kernel", "-m",
-        "128M",                "-cpu",       "rv64",               "-smp",
-        "4",                   "-nographic", "-serial",            "mon:stdio",
+        "qemu-system-riscv64", "-machine",
+        "virt",                "-bios",
+        "none",                "-kernel",
+        "zig-out/bin/kernel",  "-m",
+        "128M",                "-cpu",
+        "rv64",                "-smp",
+        "4",                   "-nographic",
+        "-serial",             "mon:stdio",
     });
 
     qemu_cmd.step.dependOn(&kernel.step);
