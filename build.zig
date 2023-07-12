@@ -17,6 +17,7 @@ pub fn build(b: *std.Build) anyerror!void {
         .name = "kernel",
     });
 
+    kernel.code_model = .medium;
     kernel.setLinkerScriptPath(.{ .path = "src/linker.lds" });
     kernel.addAssemblyFile("src/boot.s");
     b.installArtifact(kernel);
