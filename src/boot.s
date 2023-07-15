@@ -21,7 +21,7 @@ _start:
   bltu a0, a1, 1b
 
 2:
-  la sp, _stack_end
+  la sp, _stack
   li t0, (0b11 << 11) | (1 << 7) | (1 << 3)
   csrw mstatus, t0
   la t1, kmain
