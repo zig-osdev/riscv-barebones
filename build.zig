@@ -33,7 +33,7 @@ pub fn build(b: *std.Build) anyerror!void {
         "-serial",             "mon:stdio",
     });
 
-    qemu_cmd.step.dependOn(&kernel.step);
+    qemu_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| qemu_cmd.addArgs(args);
     const run_step = b.step("run", "Start the kernel in qemu");
     run_step.dependOn(&qemu_cmd.step);
