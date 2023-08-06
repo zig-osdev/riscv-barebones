@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) anyerror!void {
 
     kernel.code_model = .medium;
     kernel.setLinkerScriptPath(.{ .path = "src/linker.lds" });
-    kernel.addAssemblyFile("src/boot.s");
+    kernel.addAssemblyFile(.{ .path = "src/boot.s" });
     b.installArtifact(kernel);
 
     const qemu_cmd = b.addSystemCommand(&.{
