@@ -1,14 +1,12 @@
 const std = @import("std");
 
-const _target = std.zig.CrossTarget{
-    .cpu_arch = .riscv64,
-    .os_tag = .freestanding,
-    .abi = .none,
-};
-
 pub fn build(b: *std.Build) anyerror!void {
     const optimize = b.standardOptimizeOption(.{});
-    const target = b.standardTargetOptions(.{ .default_target = _target });
+    const target = b.standardTargetOptions(.{ .default_target = .{
+        .cpu_arch = .riscv64,
+        .os_tag = .freestanding,
+        .abi = .none,
+    } });
 
     const kernel = b.addExecutable(.{
         .root_source_file = .{ .path = "src/kernel.zig" },
