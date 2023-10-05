@@ -24,7 +24,11 @@ _start:
 
 1:
   // Clear the BSS section, where a0 is initially the address of _bss_start.
+#if __riscv_xlen == 64
   sd zero, (a0)
+#elif __riscv_xlen == 32
+  sw zero, (a0)
+#endif
   addi a0, a0, 8
   bltu a0, a1, 1b
 

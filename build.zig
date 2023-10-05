@@ -2,6 +2,7 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) anyerror!void {
     const optimize = b.standardOptimizeOption(.{});
+    // The default target is riscv64, but we also support riscv32
     const target = b.standardTargetOptions(.{ .default_target = .{
         .cpu_arch = .riscv64,
         .os_tag = .freestanding,
@@ -17,16 +18,32 @@ pub fn build(b: *std.Build) anyerror!void {
 
     kernel.code_model = .medium;
     kernel.setLinkerScriptPath(.{ .path = "src/linker.lds" });
-    kernel.addAssemblyFile(.{ .path = "src/boot.s" });
+    // Some of the boot-code changes depending on if we're targeting 32-bit
+    // or 64-bit, which is why we need the pre-processor to run first.
+    kernel.addCSourceFiles(&.{ "src/boot.S" }, &.{
+        "-x", "assembler-with-cpp",
+    });
     b.installArtifact(kernel);
 
+    const qemu = switch (target.cpu_arch.?) {
+        .riscv64 => "qemu-system-riscv64",
+        .riscv32 => "qemu-system-riscv32",
+        else => unreachable,
+    };
+
+    const qemu_cpu = switch (target.cpu_arch.?) {
+        .riscv64 => "rv64",
+        .riscv32 => "rv32",
+        else => unreachable,
+    };
+
     const qemu_cmd = b.addSystemCommand(&.{
-        "qemu-system-riscv64", "-machine",
+        qemu, "-machine",
         "virt",                "-bios",
         "none",                "-kernel",
         "zig-out/bin/kernel",  "-m",
         "128M",                "-cpu",
-        "rv64",                "-smp",
+        qemu_cpu,              "-smp",
         "4",                   "-nographic",
         "-serial",             "mon:stdio",
     });
