@@ -30,5 +30,6 @@ export fn kmain() callconv(.C) void {
     // All we're doing is setting up access to the serial device (UART)
     // and printing a simple message to make sure the kernel has started!
     uart.init();
-    println("Zig is running on barebones RISC-V!", .{});
+    // Who knows, maybe in the future we'll have rv128...
+    println("Zig is running on barebones RISC-V (rv{})!", .{ @bitSizeOf(usize) });
 }
