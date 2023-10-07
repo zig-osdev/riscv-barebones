@@ -20,7 +20,7 @@ pub fn println(comptime fmt: []const u8, args: anytype) void {
 // This the trap/exception entrypoint, this will be invoked any time
 // we get an exception (e.g if something in the kernel goes wrong) or
 // an interrupt gets delivered.
-export fn trap() callconv(.C) noreturn {
+export fn trap() align(4) callconv(.C) noreturn {
     while (true) {}
 }
 
