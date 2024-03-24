@@ -1,6 +1,6 @@
 # RISC-V Barebones Template
 
-This reposository contains a barebones template for the RISC-V architecture.
+This repository contains a barebones template for the RISC-V architecture.
 
 ## Resources
 
