@@ -14,38 +14,41 @@ pub fn build(b: *std.Build) anyerror!void {
         .optimize = optimize,
         .target = target,
         .name = "kernel",
+        .code_model = .medium,
     });
 
-    kernel.code_model = .medium;
     kernel.setLinkerScriptPath(.{ .path = "src/linker.lds" });
     // Some of the boot-code changes depending on if we're targeting 32-bit
     // or 64-bit, which is why we need the pre-processor to run first.
-    kernel.addCSourceFiles(&.{ "src/boot.S" }, &.{
-        "-x", "assembler-with-cpp",
+    kernel.addCSourceFiles(.{
+        .files = &.{"src/boot.S"},
+        .flags = &.{
+            "-x", "assembler-with-cpp",
+        },
     });
     b.installArtifact(kernel);
 
-    const qemu = switch (target.cpu_arch.?) {
+    const qemu = switch (target.result.cpu.arch) {
         .riscv64 => "qemu-system-riscv64",
         .riscv32 => "qemu-system-riscv32",
         else => unreachable,
     };
 
-    const qemu_cpu = switch (target.cpu_arch.?) {
+    const qemu_cpu = switch (target.result.cpu.arch) {
         .riscv64 => "rv64",
         .riscv32 => "rv32",
         else => unreachable,
     };
 
     const qemu_cmd = b.addSystemCommand(&.{
-        qemu, "-machine",
-        "virt",                "-bios",
-        "none",                "-kernel",
-        "zig-out/bin/kernel",  "-m",
-        "128M",                "-cpu",
-        qemu_cpu,              "-smp",
-        "4",                   "-nographic",
-        "-serial",             "mon:stdio",
+        qemu,                 "-machine",
+        "virt",               "-bios",
+        "none",               "-kernel",
+        "zig-out/bin/kernel", "-m",
+        "128M",               "-cpu",
+        qemu_cpu,             "-smp",
+        "4",                  "-nographic",
+        "-serial",            "mon:stdio",
     });
 
     qemu_cmd.step.dependOn(b.getInstallStep());
