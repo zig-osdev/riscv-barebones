@@ -10,14 +10,14 @@ pub fn build(b: *std.Build) anyerror!void {
     } });
 
     const kernel = b.addExecutable(.{
-        .root_source_file = .{ .path = "src/kernel.zig" },
+        .root_source_file = b.path("src/kernel.zig"),
         .optimize = optimize,
         .target = target,
         .name = "kernel",
         .code_model = .medium,
     });
 
-    kernel.setLinkerScriptPath(.{ .path = "src/linker.lds" });
+    kernel.setLinkerScriptPath(b.path("src/linker.lds"));
     // Some of the boot-code changes depending on if we're targeting 32-bit
     // or 64-bit, which is why we need the pre-processor to run first.
     kernel.addCSourceFiles(.{
