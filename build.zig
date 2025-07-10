@@ -2,7 +2,6 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) anyerror!void {
     const optimize = b.standardOptimizeOption(.{});
-    // The default target is riscv64, but we also support riscv32
     const target = b.standardTargetOptions(.{ .default_target = .{
         .cpu_arch = .riscv64,
         .os_tag = .freestanding,
@@ -17,15 +16,13 @@ pub fn build(b: *std.Build) anyerror!void {
         .code_model = .medium,
     });
 
-    kernel.setLinkerScriptPath(b.path("src/linker.lds"));
-    // Some of the boot-code changes depending on if we're targeting 32-bit
-    // or 64-bit, which is why we need the pre-processor to run first.
+    kernel.setLinkerScript(b.path("src/linker.lds"));
+
     kernel.addCSourceFiles(.{
         .files = &.{"src/boot.S"},
-        .flags = &.{
-            "-x", "assembler-with-cpp",
-        },
+        .flags = &.{"-x", "assembler-with-cpp"},
     });
+
     b.installArtifact(kernel);
 
     const qemu = switch (target.result.cpu.arch) {
