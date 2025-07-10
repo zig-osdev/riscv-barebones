@@ -1,19 +1,13 @@
 {
   inputs = {
     utils.url = github:numtide/flake-utils;
-    zigpkg.url = github:mitchellh/zig-overlay;
-    zlspkg.url = github:zigtools/zls;
   };
 
-  outputs = { self, nixpkgs, zigpkg, zlspkg, utils }:
+  outputs = { self, nixpkgs, utils }:
     utils.lib.eachDefaultSystem(system:
-      let
-        zig = zigpkg.packages.${system};
-        zls = zlspkg.packages.${system};
-        pkgs = nixpkgs.legacyPackages.${system};
-      in {
+      let pkgs = import nixpkgs { inherit system; }; in {
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = [ zig.master zls.default ];
+          nativeBuildInputs = with pkgs; [ zig zls ];
           buildInputs = with pkgs; [ qemu ];
         };
       });
