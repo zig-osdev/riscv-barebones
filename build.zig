@@ -9,18 +9,20 @@ pub fn build(b: *std.Build) anyerror!void {
     } });
 
     const kernel = b.addExecutable(.{
-        .root_source_file = b.path("src/kernel.zig"),
-        .optimize = optimize,
-        .target = target,
+        .root_module = b.addModule("kernel", .{
+            .root_source_file = b.path("src/kernel.zig"),
+            .target = target,
+            .optimize = optimize,
+            .code_model = .medium,
+        }),
         .name = "kernel",
-        .code_model = .medium,
     });
 
     kernel.setLinkerScript(b.path("src/linker.lds"));
 
     kernel.addCSourceFiles(.{
         .files = &.{"src/boot.S"},
-        .flags = &.{"-x", "assembler-with-cpp"},
+        .flags = &.{ "-x", "assembler-with-cpp" },
     });
 
     b.installArtifact(kernel);
