@@ -4,17 +4,17 @@ const uart = @import("uart.zig");
 // Here we set up a printf-like writer from the standard library by providing
 // a way to output via the UART.
 pub fn drainUart(w: *std.io.Writer, data: []const []const u8, splat: usize) !usize {
-    _ = try uart_put_str(w.buffer);
+    _ = try uartPutStr(w.buffer);
     w.end = 0;
     var bytes_written: usize = 0;
     for (data) |slice| {
-        bytes_written += try uart_put_str(slice);
+        bytes_written += try uartPutStr(slice);
     }
     if (splat == 0 or data.len < 1) return bytes_written;
     const last_data = data[data.len - 1];
     var i: usize = 0;
     while (i < splat) : (i += 1) {
-        bytes_written += try uart_put_str(last_data);
+        bytes_written += try uartPutStr(last_data);
     }
     return bytes_written;
 }
@@ -25,9 +25,9 @@ var uart_writer = std.io.Writer{
     .vtable = &.{ .drain = drainUart },
 };
 
-fn uart_put_str(str: []const u8) !usize {
+fn uartPutStr(str: []const u8) !usize {
     for (str) |ch| {
-        uart.put_char(ch);
+        uart.putChar(ch);
     }
     return str.len;
 }
