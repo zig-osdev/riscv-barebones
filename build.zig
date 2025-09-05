@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) anyerror!void {
     } });
 
     const kernel = b.addExecutable(.{
-        .root_module = b.addModule("kernel", .{
+        .root_module = b.createModule(.{
             .root_source_file = b.path("src/kernel.zig"),
             .target = target,
             .optimize = optimize,
