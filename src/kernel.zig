@@ -7,8 +7,9 @@ pub fn drainUart(w: *std.io.Writer, data: []const []const u8, splat: usize) !usi
     _ = try uartPutStr(w.buffer);
     w.end = 0;
     var bytes_written: usize = 0;
-    for (data) |slice| {
-        bytes_written += try uartPutStr(slice);
+    for (data, 0..) |slice, i| {
+        if (i != data.len - 1)
+            bytes_written += try uartPutStr(slice);
     }
     if (splat == 0 or data.len < 1) return bytes_written;
     const last_data = data[data.len - 1];
